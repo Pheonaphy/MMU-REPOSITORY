@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multimedia University | Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    <style>
+        :root {
+            --bg-main: #F4F6F8;
+            --sidebar-bg: #0B0F19;
+            --sidebar-hover: #161B26;
+            --text-nav: #8A94A6;
+            --accent-blue: #0052FF;
+            --accent-blue-hover: #0041CC;
+            --border-color: #E5E9F0;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: #1E2530;
+            overflow-x: hidden;
+        }
+
+        .sidebar {
+            width: 260px;
+            background-color: var(--sidebar-bg);
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+        }
+
+        .main-content {
+            margin-left: 260px;
+            padding: 2.5rem;
+            min-height: 100vh;
+        }
+
+        .brand-section {
+            padding: 2rem 1.5rem;
+            color: #FFFFFF;
+            font-weight: 700;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            letter-spacing: -0.02em;
+        }
+
+        .brand-section i {
+            color: var(--accent-blue);
+        }
+
+        .nav-custom .nav-link {
+            color: var(--text-nav);
+            padding: 0.9rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+            border-left: 4px solid transparent;
+            text-decoration: none;
+            transition: all 0.15s ease-in-out;
+        }
+
+        .nav-custom .nav-link:hover {
+            background-color: var(--sidebar-hover);
+            color: #FFFFFF;
+        }
+
+        .nav-custom .nav-link.active {
+            color: #FFFFFF;
+            background-color: var(--sidebar-hover);
+            border-left-color: var(--accent-blue);
+        }
+
+        .sidebar-section-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #4E5D78;
+            padding: 1.5rem 1.5rem 0.5rem 1.5rem;
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .user-profile-bar {
+            padding: 1.25rem 1.5rem;
+            border-top: 1px solid #161B26;
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+
+        .metric-card {
+            background: #FFFFFF;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .metric-card h6 {
+            color: #4E5D78;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+        }
+
+        .metric-card h3 {
+            font-weight: 700;
+            color: #0B0F19;
+            margin: 0;
+        }
+
+        .metric-icon-box {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .bg-blue-light { background-color: #E6EFFF; color: var(--accent-blue); }
+        .bg-green-light { background-color: #E6F7ED; color: #00AA45; }
+        .bg-purple-light { background-color: #F3E8FF; color: #7C3AED; }
+
+        .dashboard-card {
+            background: #FFFFFF;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .table-custom th {
+            color: #4E5D78;
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            border-bottom: 2px solid var(--border-color);
+            padding: 1rem;
+            background-color: #FAFBFC;
+        }
+
+        .table-custom td {
+            padding: 1.1rem 1rem;
+            font-size: 0.92rem;
+            color: #1E2530;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .bell-dropdown-menu {
+            width: 320px;
+            border: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            border-radius: 12px;
+            padding: 0.5rem 0;
+        }
+        
+        .notification-item {
+            padding: 0.85rem 1.25rem;
+            border-bottom: 1px solid var(--border-color);
+            transition: background-color 0.15s ease;
+        }
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+        .notification-item:hover {
+            background-color: #FAFBFC;
+        }
+        .logout-btn {
+            background: none;
+            border: none;
+            color: var(--text-nav);
+            transition: color 0.2s;
+        }
+        .logout-btn:hover {
+            color: #FF4D4D;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div>
+            <div class="brand-section">
+                <i class="bi bi-box-fill"></i>
+                <span>Multimedia University</span>
+            </div>
+            
+            <p class="sidebar-section-title">Admin Management</p>
+            <nav class="nav-custom d-flex flex-column">
+                <a class="nav-link" th:classappend="${activeTab == 'dashboard' or activeTab == null ? 'active' : ''}" th:href="@{/admin-dashboard(tab='dashboard')}">
+                    <i class="bi bi-grid-1x2-fill"></i> Dashboard
+                </a>
+                <a class="nav-link" th:classappend="${activeTab == 'user_approvals' ? 'active' : ''}" th:href="@{/admin-dashboard(tab='user_approvals')}">
+                    <i class="bi bi-people-fill"></i> User Approvals
+                </a>
+                <a class="nav-link" th:classappend="${activeTab == 'funding_appeals' ? 'active' : ''}" th:href="@{/admin-dashboard(tab='funding_appeals')}">
+                    <i class="bi bi-wallet2"></i> Funding Appeals
+                </a>
+            </nav>
+        </div>
+
+        <div class="user-profile-bar">
+            <div class="d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; background-color: var(--accent-blue) !important;">
+                        <i class="bi bi-shield-lock-fill"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-white mb-0" style="font-size: 0.85rem; font-weight: 600;">Admin User</h6>
+                        <span style="font-size: 0.75rem; color: var(--text-nav);">System Administrator</span>
+                    </div>
+                </div>
+                <form th:action="@{/logout}" method="post" class="m-0">
+                    <button type="submit" class="logout-btn p-1" title="Log Out">
+                        <i class="bi bi-power fs-5"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <main class="main-content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="fw-bold mb-1" style="letter-spacing: -0.02em;">Welcome back, Admin</h2>
+                <p style="color: #4E5D78; margin: 0; font-size: 0.95rem;">Here's what's happening with the repository platform today.</p>
+            </div>
+            
+            <div class="dropdown">
+                <button class="btn btn-white bg-white border position-relative rounded-circle p-2" 
+                        style="border-color: var(--border-color) !important; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;"
+                        type="button" id="bellMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-bell text-dark fs-5"></i>
+                    <span th:if="${users != null and #lists.size(users.?[!approved]) > 0}" 
+                          class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" 
+                          style="font-size: 0.6rem; transform: translate(-35%, -10%) !important;"
+                          th:text="${#lists.size(users.?[!approved])}">0</span>
+                </button>
+                
+                <ul class="dropdown-menu dropdown-menu-end bell-dropdown-menu m-0 mt-2 p-0 shadow-lg border-0" aria-labelledby="bellMenuButton">
+                    <li class="px-3 py-2 border-bottom bg-light rounded-top-2">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-bold small text-dark">Notifications Log</span>
+                            <span class="badge bg-primary-subtle text-primary rounded-pill px-2 py-1" style="font-size: 0.7rem;" 
+                                  th:text="${users != null ? #lists.size(users.?[!approved]) : '0'} + ' Actionable'">0 Actionable</span>
+                        </div>
+                    </li>
+                    <div style="max-height: 280px; overflow-y: auto;">
+                        <li th:each="u : ${users}" th:if="${!u.approved}" class="notification-item">
+                            <a th:href="@{/admin-dashboard(tab='user_approvals')}" class="text-decoration-none d-flex gap-2 align-items-start">
+                                <div class="text-primary mt-0.5"><i class="bi bi-person-plus-fill"></i></div>
+                                <div>
+                                    <p class="mb-0 text-dark small" style="line-height: 1.3;">
+                                        Registration validation request pending for user <strong th:text="${u.username}">Target</strong>.
+                                    </p>
+                                    <span class="text-muted text-uppercase tracking-wider d-block mt-1" style="font-size: 0.65rem; font-weight: 700;" th:text="${u.role}">ROLE</span>
+                                </div>
+                            </a>
+                        </li>
+                        <li th:if="${users == null or #lists.size(users.?[!approved]) == 0}" class="text-center py-4 px-3 text-muted">
+                            <i class="bi bi-shield-check text-success fs-3 d-block mb-1"></i>
+                            <span class="small">The platform queue is clean.</span>
+                        </li>
+                    </div>
+                </ul>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <div class="col-xl-4 col-md-6">
+                <div class="metric-card">
+                    <div>
+                        <h6>Users Awaiting Approval</h6>
+                        <h3 th:text="${users != null ? #lists.size(users.?[!approved]) : '0'}">0</h3>
+                    </div>
+                    <div class="metric-icon-box bg-blue-light">
+                        <i class="bi bi-person-fill-gear"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-4 col-md-6">
+                <div class="metric-card">
+                    <div>
+                        <h6>Total System Projects</h6>
+                        <h3 th:text="${projects != null ? #lists.size(projects) : '0'}">0</h3>
+                    </div>
+                    <div class="metric-icon-box bg-green-light">
+                        <i class="bi bi-folder-fill"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-card" th:if="${activeTab == 'dashboard' or activeTab == null}">
+            <div class="mb-4">
+                <h5 class="fw-bold mb-1" style="color: #0B0F19;">System Master Overview Pipeline</h5>
+                <p style="color: #4E5D78; font-size: 0.88rem; margin: 0;">Review systemic health logs and registration tasks requiring administrative actions.</p>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table table-custom align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>User Account</th>
+                            <th>Operational Domain</th>
+                            <th>Account Status</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="u : ${users}" th:if="${!u.approved}">
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center fw-bold" style="width: 40px; height: 40px;">
+                                        <i class="bi bi-person-gear"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-sm font-medium text-gray-900 fw-bold" th:text="${u.username}">Username</div>
+                                        <div class="text-xs text-uppercase tracking-wider text-primary fw-semibold" style="font-size: 0.75rem;" th:text="${u.role}">ROLE</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span th:if="${u.role == 'SPONSOR'}">Institutional Capital Partner Access</span>
+                                <span th:if="${u.role == 'SUPERVISOR'}">Academic Assessment Evaluator Access</span>
+                                <span th:if="${u.role == 'STUDENT'}">Research Submitter Access</span>
+                            </td>
+                            <td>
+                                <span class="px-3 py-1 text-xs font-semibold" style="border-radius: 20px; font-size: 0.8rem; background-color: #FFF6E6; color: #FFA000; font-weight: 600;" th:text="'Pending Review'">Pending Review</span>
+                            </td>
+                            <td class="text-end">
+                                <form th:action="@{/approve-user}" method="post" class="d-inline m-0">
+                                    <input type="hidden" name="userId" th:value="${u.id}">
+                                    <button type="submit" class="btn btn-sm btn-primary rounded-pill px-3" style="background-color: #0052FF; border: none;">
+                                        <i class="bi bi-check-circle-fill me-1"></i> Quick Approve
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        <tr th:if="${users == null or #lists.size(users.?[!approved]) == 0}">
+                            <td colspan="4" class="text-center text-muted py-4">No validation tasks currently in queue.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="dashboard-card" th:if="${activeTab == 'user_approvals'}">
+            <div class="mb-4">
+                <h5 class="fw-bold mb-1" style="color: #0B0F19;">Access Credentialing Authority Ledger</h5>
+                <p style="color: #4E5D78; font-size: 0.88rem; margin: 0;">Approve or revoke user roles inside the institutional directory framework.</p>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-custom align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Account Holder</th>
+                            <th>Role Category</th>
+                            <th>Approval Status</th>
+                            <th class="text-end">Action Handler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="u : ${users}">
+                            <td class="fw-bold" th:text="${u.username}">User</td>
+                            <td class="text-primary fw-medium" th:text="${u.role}">ROLE</td>
+                            <td>
+                                <span th:if="${u.approved}" class="badge bg-success px-3 py-1 rounded-pill">APPROVED</span>
+                                <span th:if="${!u.approved}" class="badge bg-warning text-dark px-3 py-1 rounded-pill">PENDING</span>
+                            </td>
+                            <td class="text-end">
+                                <form th:if="${!u.approved}" th:action="@{/approve-user}" method="post" class="d-inline m-0">
+                                    <input type="hidden" name="userId" th:value="${u.id}">
+                                    <button type="submit" class="btn btn-sm btn-success rounded-pill px-3">Activate Account</button>
+                                </form>
+                                <span th:if="${u.approved}" class="text-muted small"><i class="bi bi-shield-check text-success"></i> Active System Access</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="dashboard-card" th:if="${activeTab == 'funding_appeals'}">
+            <div class="mb-4">
+                <h5 class="fw-bold mb-1" style="color: #0B0F19;">Active Project Funding Appeals Ledger</h5>
+                <p style="color: #4E5D78; font-size: 0.88rem; margin: 0;">Review, validate, and forward student multimedia research projects to corporate sponsors.</p>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table table-custom align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Project Title</th>
+                            <th>Student Submitter</th>
+                            <th>Vetting Supervisor</th>
+                            <th>Status Signature</th>
+                            <th class="text-end">Integration Handlers</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="project : ${projects}" th:if="${project.status == 'APPLIED_FOR_FUNDING' or project.forwardedToSponsor}">
+                            <td>
+                                <span class="fw-bold text-dark d-block" th:text="${project.title}">Project Title</span>
+                            </td>
+                            <td>
+                                <span class="d-block small text-secondary" th:text="${project.studentName}">Student</span>
+                                <span class="text-muted extra-small" style="font-size: 0.75rem;" th:text="${project.studentEmail}">email@mmu.ac.ke</span>
+                            </td>
+                            <td th:text="${project.supervisorName}">Assigned Faculty</td>
+                            <td>
+                                <span th:if="${project.status == 'APPLIED_FOR_FUNDING'}" class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1">APPLIED_FOR_FUNDING</span>
+                                <span th:if="${project.forwardedToSponsor}" class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3 py-1">FORWARDED_TO_SPONSOR</span>
+                            </td>
+                            <td class="text-end">
+                                <form th:if="${!project.forwardedToSponsor}" th:action="@{/admin/forward-project}" method="post" class="m-0 d-inline">
+                                    <input type="hidden" name="projectId" th:value="${project.id}">
+                                    <button type="submit" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                                        <i class="bi bi-send-fill me-1"></i> Forward to Sponsor
+                                    </button>
+                                </form>
+                                <button th:if="${project.forwardedToSponsor}" class="btn btn-sm btn-light border text-muted rounded-pill px-3" disabled>
+                                    <i class="bi bi-check-all text-success me-1"></i> Dispatched
+                                </button>
+                            </td>
+                        </tr>
+                        <tr th:if="${projects == null or #lists.size(projects.?[status == 'APPLIED_FOR_FUNDING' or forwardedToSponsor]) == 0}">
+                            <td colspan="5" class="text-center text-muted py-5">
+                                <i class="bi bi-wallet2 fs-2 d-block mb-2 text-secondary"></i>
+                                No active research project funding applications are currently logged.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

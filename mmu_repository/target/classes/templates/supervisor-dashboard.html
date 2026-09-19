@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multimedia University | Supervisor Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    <style>
+        :root {
+            --bg-main: #F4F6F8;
+            --sidebar-bg: #0B0F19;
+            --sidebar-hover: #161B26;
+            --text-nav: #8A94A6;
+            --accent-blue: #0052FF;
+            --accent-blue-hover: #0041CC;
+            --border-color: #E5E9F0;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            color: #1E2530;
+            overflow-x: hidden;
+        }
+
+        /* Fixed Sidebar Mechanics */
+        .sidebar {
+            width: 260px;
+            background-color: var(--sidebar-bg);
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+        }
+
+        .main-content {
+            margin-left: 260px;
+            padding: 2.5rem;
+            min-height: 100vh;
+        }
+
+        .brand-section {
+            padding: 2rem 1.5rem;
+            color: #FFFFFF;
+            font-weight: 700;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .brand-section i { color: var(--accent-blue); }
+
+        .nav-custom .nav-link {
+            color: var(--text-nav);
+            padding: 0.9rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+            border-left: 4px solid transparent;
+            transition: all 0.15s ease-in-out;
+        }
+
+        .nav-custom .nav-link:hover {
+            background-color: var(--sidebar-hover);
+            color: #FFFFFF;
+        }
+
+        .nav-custom .nav-link.active {
+            color: #FFFFFF;
+            background-color: var(--sidebar-hover);
+            border-left-color: var(--accent-blue);
+        }
+
+        .sidebar-section-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #4E5D78;
+            padding: 1.5rem 1.5rem 0.5rem 1.5rem;
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .user-profile-bar {
+            padding: 1.25rem 1.5rem;
+            border-top: 1px solid #161B26;
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+
+        /* Metric Cards */
+        .metric-card {
+            background: #FFFFFF;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .metric-icon-box {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+        .bg-orange-light { background-color: #FFF6E6; color: #FFA000; }
+        .bg-blue-light { background-color: #E6EFFF; color: var(--accent-blue); }
+        .bg-green-light { background-color: #E6F7ED; color: #00AA45; }
+
+        /* Dashboard Master Card Box */
+        .dashboard-card {
+            background: #FFFFFF;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+        }
+
+        .table-custom th {
+            color: #4E5D78;
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            border-bottom: 2px solid var(--border-color);
+            padding: 1rem;
+            background-color: #FAFBFC;
+        }
+
+        .table-custom td {
+            padding: 1.1rem 1rem;
+            font-size: 0.92rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        /* Control Action UI Buttons */
+        .btn-approve { background-color: #00AA45; color: white; border: none; padding: 0.4rem 0.9rem; border-radius: 6px; font-size: 0.85rem; font-weight: 500; }
+        .btn-approve:hover { background-color: #008837; }
+        .btn-reject { background-color: transparent; border: 1px solid #EF4444; color: #EF4444; padding: 0.4rem 0.9rem; border-radius: 6px; font-size: 0.85rem; font-weight: 500; }
+        .btn-reject:hover { background-color: #EF4444; color: white; }
+        .btn-forward { background-color: var(--accent-blue); color: white; border: none; padding: 0.4rem 0.9rem; border-radius: 6px; font-size: 0.85rem; font-weight: 500; }
+        .btn-forward:hover { background-color: var(--accent-blue-hover); }
+
+        .badge-pending { background-color: #FFF6E6; color: #FFA000; font-weight: 600; padding: 0.4rem 0.75rem; border-radius: 6px; }
+        .badge-approved { background-color: #E6F7ED; color: #00AA45; font-weight: 600; padding: 0.4rem 0.75rem; border-radius: 6px; }
+        .badge-funded { background-color: #E6EFFF; color: var(--accent-blue); font-weight: 600; padding: 0.4rem 0.75rem; border-radius: 6px; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div>
+            <div class="brand-section">
+                <i class="bi bi-box-fill"></i>
+                <span>Multimedia University</span>
+            </div>
+            
+            <p class="sidebar-section-title">Review Desk</p>
+            <nav class="nav flex-column nav-custom">
+                <a th:classappend="${activeTab == 'pending' || activeTab == null ? 'active' : ''}" class="nav-link" href="/supervisor-dashboard?tab=pending">
+                    <i class="bi bi-hourglass-split"></i> Pending Reviews
+                </a>
+                <a th:classappend="${activeTab == 'all_projects' ? 'active' : ''}" class="nav-link" href="/supervisor-dashboard?tab=all_projects">
+                    <i class="bi bi-folder-fill"></i> Total Assignments
+                </a>
+            </nav>
+        </div>
+
+        <div class="user-profile-bar">
+            <div class="d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; background-color: var(--accent-blue) !important;">
+                        <i class="bi bi-person-badge-fill"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-white mb-0" style="font-size: 0.85rem; font-weight: 600;" th:text="${currentUser != null ? currentUser.username : 'Supervisor'}">Supervisor Account</h6>
+                        <span style="font-size: 0.75rem; color: var(--text-nav);">Project Evaluator</span>
+                    </div>
+                </div>
+                <form th:action="@{/logout}" method="post" class="m-0">
+                    <button type="submit" class="btn btn-link text-danger p-1" title="Sign Out">
+                        <i class="bi bi-power fs-5"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <main class="main-content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="fw-bold mb-1" style="letter-spacing: -0.02em;">Supervisor Assessment Desk </h2>
+                <p style="color: #4E5D78; margin: 0; font-size: 0.95rem;">Evaluate submitted student document abstracts and forward authorizations into the corporate pipelines.</p>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <div class="col-xl-4 col-md-6">
+                <div class="metric-card">
+                    <div>
+                        <h6 class="text-muted small fw-semibold mb-1">Awaiting Evaluation</h6>
+                        <h3 class="fw-bold" th:text="${#lists.size(pendingProjects)}">0</h3>
+                    </div>
+                    <div class="metric-icon-box bg-orange-light">
+                        <i class="bi bi-clipboard2-pulse-fill"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-4 col-md-6">
+                <div class="metric-card">
+                    <div>
+                        <h6 class="text-muted small fw-semibold mb-1">Total Assigned Items</h6>
+                        <h3 class="fw-bold" th:text="${#lists.size(pendingProjects) + #lists.size(approvedProjects) + #lists.size(rejectedProjects)}">0</h3>
+                    </div>
+                    <div class="metric-icon-box bg-blue-light">
+                        <i class="bi bi-journal-bookmark-fill"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-card" th:if="${activeTab == 'pending' || activeTab == null}">
+            <h5 class="fw-bold mb-3" style="color: #0B0F19;">Submissions Requiring Immediate Review</h5>
+            <div class="table-responsive">
+                <table class="table table-custom align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Student Submitter</th>
+                            <th>Research Document Title</th>
+                            <th>Attached Content</th>
+                            <th class="text-end">Evaluation Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="p : ${pendingProjects}">
+                            <td>
+                                <span class="fw-bold text-dark" th:text="${p.studentName}">Student</span>
+                                <div class="small text-muted" th:text="${p.studentEmail}">student@mmu.com</div>
+                            </td>
+                            <td>
+                                <span class="fw-semibold text-dark" th:text="${p.title}">Project Title</span>
+                                <div class="text-muted small text-truncate" style="max-width: 340px;" th:text="${p.description}">Description</div>
+                            </td>
+                            <td>
+                                <a th:if="${p.filePath != null}" th:href="@{/download(id=${p.id})}" target="_blank" class="text-decoration-none small">
+                                    <i class="bi bi-file-earmark-pdf text-danger me-1"></i> View Documentation
+                                </a>
+                                <span th:unless="${p.filePath != null}" class="text-muted small">No File Attached</span>
+                            </td>
+                            <td class="text-end">
+                                <div class="d-inline-flex gap-2">
+                                    <form th:action="@{/supervisor-evaluate}" method="post" class="m-0">
+                                        <input type="hidden" name="projectId" th:value="${p.id}">
+                                        <input type="hidden" name="action" value="APPROVE">
+                                        <button type="submit" class="btn-approve"><i class="bi bi-shield-check me-1"></i> Endorse</button>
+                                    </form>
+                                    <form th:action="@{/supervisor-evaluate}" method="post" class="m-0">
+                                        <input type="hidden" name="projectId" th:value="${p.id}">
+                                        <input type="hidden" name="action" value="REJECT">
+                                        <button type="submit" class="btn-reject">Reject</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(pendingProjects)}">
+                            <td colspan="4" class="text-center py-4 text-muted small">No pipeline research assignments currently require your clearance.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="dashboard-card" th:if="${activeTab == 'all_projects'}">
+            <h5 class="fw-bold mb-3" style="color: #0B0F19;">Historical Submission Audit Ledger</h5>
+            <div class="table-responsive">
+                <table class="table table-custom align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Project Abstract Context</th>
+                            <th>Tracking Status</th>
+                            <th class="text-end" style="width: 320px;">Corporate Routing Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="p : ${pendingProjects}">
+                            <td>
+                                <span class="fw-bold text-dark" th:text="${p.studentName}">Author</span>
+                                <div class="small text-muted" th:text="${p.studentEmail}">email</div>
+                            </td>
+                            <td><span class="fw-semibold text-dark" th:text="${p.title}">Title</span></td>
+                            <td><span class="badge badge-pending">PENDING_SUPERVISOR</span></td>
+                            <td class="text-end"><span class="text-muted small">- Awaiting Clearance -</span></td>
+                        </tr>
+                        
+                        <tr th:each="p : ${approvedProjects}">
+                            <td>
+                                <span class="fw-bold text-dark" th:text="${p.studentName}">Author</span>
+                                <div class="small text-muted" th:text="${p.studentEmail}">email</div>
+                            </td>
+                            <td><span class="fw-semibold text-dark" th:text="${p.title}">Title</span></td>
+                            <td>
+                                <span class="badge" 
+                                      th:classappend="${p.status == 'SUPERVISOR_APPROVED' ? 'badge-approved' : 'badge-funded'}"
+                                      th:text="${p.status}">State</span>
+                            </td>
+                            <td class="text-end">
+                                <div th:if="${p.status == 'SUPERVISOR_APPROVED'}">
+                                    <form th:action="@{/forward-to-sponsor}" method="post" class="d-inline-flex gap-2 align-items-center">
+                                        <input type="hidden" name="projectId" th:value="${p.id}">
+                                        <select name="sponsorUsername" class="form-select form-select-sm" style="min-width: 160px;" required>
+                                            <option value="" disabled selected>-- Select Sponsor --</option>
+                                            <option th:each="s : ${sponsors}" th:value="${s.username}" th:text="${s.username}">Sponsor Name</option>
+                                        </select>
+                                        <button type="submit" class="btn-forward btn-sm text-nowrap">Forward Hub</button>
+                                    </form>
+                                </div>
+                                <div th:if="${p.status == 'FUNDED' || p.allocatedFunds != null}">
+                                    <span class="text-success small fw-bold">
+                                        Funded: KSh <span th:text="${p.allocatedFunds}">0.00</span>
+                                    </span>
+                                    <div class="text-muted small" th:text="${'via ' + p.sponsorName}">Sponsor</div>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr th:each="p : ${rejectedProjects}">
+                            <td>
+                                <span class="fw-bold text-dark" th:text="${p.studentName}">Author</span>
+                                <div class="small text-muted" th:text="${p.studentEmail}">email</div>
+                            </td>
+                            <td><span class="fw-semibold text-dark" th:text="${p.title}">Title</span></td>
+                            <td><span class="badge bg-danger text-white rounded-2">REJECTED</span></td>
+                            <td class="text-end"><span class="text-muted small text-danger">Evaluation Dropped</span></td>
+                        </tr>
+
+                        <tr th:if="${#lists.isEmpty(pendingProjects) && #lists.isEmpty(approvedProjects) && #lists.isEmpty(rejectedProjects)}">
+                            <td colspan="4" class="text-center py-4 text-muted small">No pipeline research assignments mapped to your account ledger.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multimedia University | Sponsor Capital Panel</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    <style>
+        :root {
+            --bg-main: #F4F6F8;
+            --sidebar-bg: #0B0F19;
+            --sidebar-hover: #161B26;
+            --text-nav: #8A94A6;
+            --accent-green: #00AA45;
+            --accent-blue: #0052FF;
+            --border-color: #E5E9F0;
+        }
+        body { 
+            background-color: var(--bg-main); 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            color: #1E2530; 
+            overflow-x: hidden; 
+        }
+        
+        .sidebar { 
+            width: 260px; 
+            background-color: var(--sidebar-bg); 
+            height: 100vh; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            z-index: 1000; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: space-between; 
+        }
+        .main-content { 
+            margin-left: 260px; 
+            padding: 2.5rem; 
+            min-height: 100vh; 
+        }
+        
+        .nav-custom .nav-link { 
+            color: var(--text-nav); 
+            padding: 0.9rem 1.5rem; 
+            display: flex; 
+            align-items: center; 
+            gap: 0.8rem; 
+            font-size: 0.95rem; 
+            font-weight: 500; 
+            border-left: 4px solid transparent; 
+            text-decoration: none; 
+        }
+        .nav-custom .nav-link:hover { 
+            background-color: var(--sidebar-hover); 
+            color: #FFFFFF; 
+        }
+        .nav-custom .nav-link.active { 
+            color: #FFFFFF; 
+            background-color: var(--sidebar-hover); 
+            border-left-color: var(--accent-green); 
+        }
+        
+        .dashboard-card { 
+            background: #FFFFFF; 
+            border: 1px solid var(--border-color); 
+            border-radius: 12px; 
+            padding: 2rem; 
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03); 
+        }
+        .table-custom th { 
+            color: #4E5D78; 
+            font-weight: 600; 
+            font-size: 0.8rem; 
+            text-transform: uppercase; 
+            border-bottom: 2px solid var(--border-color); 
+            padding: 1rem; 
+            background-color: #FAFBFC; 
+        }
+        .table-custom td { 
+            padding: 1.1rem 1rem; 
+            font-size: 0.92rem; 
+            border-bottom: 1px solid var(--border-color); 
+        }
+        
+        .badge-approved { 
+            background-color: #E6F7ED; 
+            color: #00AA45; 
+            font-weight: 600; 
+            padding: 0.4rem 0.75rem; 
+            border-radius: 6px; 
+        }
+        .badge-funded { 
+            background-color: #E6EFFF; 
+            color: var(--accent-blue); 
+            font-weight: 600; 
+            padding: 0.4rem 0.75rem; 
+            border-radius: 6px; 
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div>
+            <div class="p-4 text-white fw-bold fs-4 d-flex align-items-center gap-2">
+                <i class="bi bi-box-fill text-success"></i> Multimedia University
+            </div>
+            <p class="text-uppercase tracking-wider text-muted px-4 mb-2" style="font-size: 0.75rem; font-weight:600;">Sponsor Portal</p>
+            <nav class="nav flex-column nav-custom">
+                <a th:classappend="${activeTab == 'pipeline' || activeTab == null ? 'active' : ''}" class="nav-link" href="/sponsor-dashboard?tab=pipeline">
+                    <i class="bi bi-currency-exchange"></i> Funding Pipeline
+                </a>
+                <a th:classappend="${activeTab == 'advertise' ? 'active' : ''}" class="nav-link" href="/sponsor-dashboard?tab=advertise">
+                    <i class="bi bi-bullhorn"></i> Post Campaigns
+                </a>
+                <a th:classappend="${activeTab == 'history' ? 'active' : ''}" class="nav-link" href="/sponsor-dashboard?tab=history">
+                    <i class="bi bi-check2-all"></i> Funded Ledger
+                </a>
+            </nav>
+        </div>
+
+        <div class="p-3" style="border-top: 1px solid #161B26; background: rgba(0,0,0,0.2);">
+            <div class="d-flex align-items-center justify-content-between text-white">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center" style="width:36px; height:36px;"><i class="bi bi-building-fill"></i></div>
+                    <div>
+                        <h6 class="mb-0 small fw-bold" th:text="${currentUser != null ? currentUser.username : 'Sponsor'}">Investor</h6>
+                        <span style="font-size:0.7rem; color: var(--text-nav);">Capital Partner</span>
+                    </div>
+                </div>
+                <form th:action="@{/logout}" method="post" class="m-0">
+                    <button type="submit" class="btn btn-link text-danger p-0"><i class="bi bi-power fs-5"></i></button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <main class="main-content">
+        <div class="mb-4">
+            <h2 class="fw-bold mb-1" 
+                th:text="${activeTab == 'history' ? 'Capital Allocation Ledger' : (activeTab == 'advertise' ? 'Campaign Management' : 'Active Investment Opportunities')}">Sponsor Desk</h2>
+            <p class="text-muted" th:text="${activeTab == 'advertise' ? 'Create new competitive funding opportunities for final year multimedia tracks.' : 'Review institutional applications approved by academic supervisors and deploy capital assets.'}"></p>
+        </div>
+
+        <div th:if="${param.success != null}" class="alert alert-success alert-dismissible fade show border-0 mb-4 shadow-sm" role="alert" style="border-left: 4px solid #00AA45 !important;">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            <span th:if="${param.success[0] == 'advertised'}">Funding campaign has been posted and published live successfully!</span>
+            <span th:if="${param.success[0] == 'funded'}">Grant capital endowment has been securely distributed to the project row!</span>
+            <button type="submit" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <div class="dashboard-card" th:if="${activeTab == 'pipeline' || activeTab == null}">
+            <h5 class="fw-bold mb-3">Vetted Projects Awaiting Endowment</h5>
+            <div class="table-responsive">
+                <table class="table table-custom align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Researcher</th>
+                            <th>Project Blueprint Title</th>
+                            <th>Status State</th>
+                            <th style="width: 320px;">Grant Allocation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="p : ${pendingFunding}">
+                            <td>
+                                <span class="fw-bold text-dark" th:text="${p.studentName}">Student</span>
+                                <div class="small text-muted" th:text="${p.studentEmail}">email@mmu.ac.ke</div>
+                            </td>
+                            <td><span class="text-dark fw-semibold" th:text="${p.title}">Title Abstract</span></td>
+                            <td><span class="badge-approved">Awaiting Funding</span></td>
+                            <td>
+                                <form th:action="@{/sponsor-fund}" method="post" class="d-flex gap-2 align-items-center m-0">
+                                    <input type="hidden" name="projectId" th:value="${p.id}">
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-text fw-bold text-secondary">KSh</span>
+                                        <input type="number" name="fundingAmount" class="form-control" placeholder="Amount..." min="1" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-sm btn-success px-3 fw-medium text-nowrap">Grant Fund</button>
+                                </form>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(pendingFunding)}">
+                            <td colspan="4" class="text-center py-4 text-muted small">No new supervisor-endorsed research grants are currently awaiting capital allocation.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="dashboard-card" th:if="${activeTab == 'advertise'}">
+            <h5 class="fw-bold mb-3"><i class="bi bi-file-earmark-plus text-primary me-1"></i>Publish New Grant Opportunity</h5>
+            <form th:action="@{/sponsor/advertise}" method="POST">
+                <div class="row g-3">
+                    <div class="col-md-8">
+                        <label class="form-label small fw-bold text-secondary text-uppercase">Campaign / Grant Title</label>
+                        <input type="text" name="title" class="form-control" placeholder="e.g., Extended Reality (XR) Innovation Fellowship" required style="padding: 0.6rem;" />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small fw-bold text-secondary text-uppercase">Allocated Budget (KSh)</label>
+                        <div class="input-group">
+                            <span class="input-group-text">KES</span>
+                            <input type="number" name="amount" class="form-control" placeholder="75000" min="1" required style="padding: 0.6rem;" />
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label small fw-bold text-secondary text-uppercase">Scope & Eligibility Criteria Description</label>
+                        <textarea name="description" class="form-control" rows="4" placeholder="Provide full implementation parameters, expected tech-stack deliverables, and criteria..." required></textarea>
+                    </div>
+                    <div class="col-12 mt-4 text-end">
+                        <button type="submit" class="btn btn-success fw-semibold px-4 py-2" style="background-color: var(--accent-green); border: none;"><i class="bi bi-send me-1"></i>Publish Campaign Announcement</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="dashboard-card" th:if="${activeTab == 'history'}">
+            <h5 class="fw-bold mb-3">Distributed Capital Portfolio</h5>
+            <div class="table-responsive">
+                <table class="table table-custom align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Recipient Student</th>
+                            <th>Funded Project Title Context</th>
+                            <th>Audit Tracking Note</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="p : ${fundedProjects}">
+                            <td><span class="text-muted fw-bold" th:text="${p.studentName}">Student</span></td>
+                            <td><span class="fw-semibold text-dark" th:text="${p.title}">Project Title</span></td>
+                            <td>
+                                <span class="text-secondary small">
+                                    <a th:if="${p.filePath != null}" th:href="@{/download(id=${p.id})}" target="_blank" class="text-decoration-none">
+                                        <i class="bi bi-file-earmark-pdf text-danger me-1"></i> View Documentation
+                                    </a>
+                                    <span th:unless="${p.filePath != null}" class="text-muted">No File Attached</span>
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge-funded text-nowrap">
+                                    Disbursed: KSh <span th:text="${p.allocatedFunds != null ? p.allocatedFunds : '0.00'}">0.00</span>
+                                </span>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(fundedProjects)}">
+                            <td colspan="4" class="text-center py-4 text-muted small">No grant disbursements recorded in the current active portfolio lifecycle.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

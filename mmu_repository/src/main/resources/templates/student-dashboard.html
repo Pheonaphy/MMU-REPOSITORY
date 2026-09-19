@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multimedia University | Student Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --bg-main: #F4F6F8;
+            --sidebar-bg: #0B0F19;
+            --sidebar-hover: #161B26;
+            --text-nav: #8A94A6;
+            --accent-blue: #0052FF;
+            --accent-blue-hover: #0041CC;
+            --border-color: #E5E9F0;
+        }
+        body { background-color: var(--bg-main); font-family: -apple-system, sans-serif; color: #1E2530; overflow-x: hidden; }
+        .sidebar { width: 260px; background-color: var(--sidebar-bg); height: 100vh; position: fixed; top: 0; left: 0; z-index: 1000; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 2px 0 10px rgba(0,0,0,0.05); }
+        .main-content { margin-left: 260px; padding: 2.5rem; min-height: 100vh; }
+        .brand-section { padding: 2rem 1.5rem; color: #FFFFFF; font-weight: 700; font-size: 1.4rem; display: flex; align-items: center; gap: 0.6rem; }
+        .brand-section i { color: var(--accent-blue); }
+        .nav-custom .nav-link { color: var(--text-nav); padding: 0.85rem 1.5rem; display: flex; align-items: center; gap: 0.8rem; font-size: 0.92rem; font-weight: 500; border-left: 4px solid transparent; transition: all 0.15s; text-decoration: none; }
+        .nav-custom .nav-link:hover { background-color: var(--sidebar-hover); color: #FFFFFF; }
+        .nav-custom .nav-link.active { color: #FFFFFF; background-color: var(--sidebar-hover); border-left-color: var(--accent-blue); }
+        .sidebar-section-title { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: #4E5D78; padding: 1.5rem 1.5rem 0.5rem 1.5rem; margin: 0; font-weight: 600; }
+        .user-profile-bar { padding: 1.25rem 1.5rem; border-top: 1px solid #161B26; background-color: rgba(0, 0, 0, 0.2); }
+        .dashboard-card { background: #FFFFFF; border: 1px solid var(--border-color); border-radius: 12px; padding: 2rem; margin-bottom: 2rem; }
+        .badge-pending { background-color: #FFF6E6; color: #FFA000; font-weight: 600; padding: 0.4rem 0.75rem; border-radius: 6px; font-size: 0.8rem; }
+        .badge-approved { background-color: #E6F7ED; color: #00AA45; font-weight: 600; padding: 0.4rem 0.75rem; border-radius: 6px; font-size: 0.8rem; }
+        .badge-funded { background-color: #E6EFFF; color: var(--accent-blue); font-weight: 600; padding: 0.4rem 0.75rem; border-radius: 6px; font-size: 0.8rem; }
+        .btn-accent { background-color: var(--accent-blue); color: #FFFFFF; font-weight: 500; padding: 0.6rem 1.5rem; border-radius: 6px; border: none; }
+        .btn-accent:hover { background-color: var(--accent-blue-hover); }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div>
+            <div class="brand-section">
+                <i class="bi bi-box-fill"></i>
+                <span>Multimedia University</span>
+            </div>
+            <p class="sidebar-section-title">Student Portal</p>
+            <nav class="nav flex-column nav-custom">
+                <a th:classappend="${activeTab == 'submissions' || activeTab == null ? 'active' : ''}" class="nav-link" href="/student-dashboard?tab=submissions">
+                    <i class="bi bi-file-earmark-text-fill"></i> My Submissions
+                </a>
+                <a th:classappend="${activeTab == 'upload' ? 'active' : ''}" class="nav-link" href="/student-dashboard?tab=upload">
+                    <i class="bi bi-cloud-arrow-up-fill"></i> Upload Project
+                </a>
+                <a th:classappend="${activeTab == 'approved' ? 'active' : ''}" class="nav-link" href="/student-dashboard?tab=approved">
+                    <i class="bi bi-patch-check-fill"></i> Approved Projects
+                </a>
+                <a th:classappend="${activeTab == 'funded' ? 'active' : ''}" class="nav-link" href="/student-dashboard?tab=funded">
+                    <i class="bi bi-cash-coin"></i> Funded Projects
+                </a>
+                <a th:classappend="${activeTab == 'progress' ? 'active' : ''}" class="nav-link" href="/student-dashboard?tab=progress">
+                    <i class="bi bi-bar-chart-line-fill"></i> Funding Progress
+                </a>
+            </nav>
+        </div>
+
+        <div class="user-profile-bar">
+            <div class="d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; background-color: var(--accent-blue);">
+                        <i class="bi bi-person-fill"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-white mb-0" style="font-size: 0.85rem; font-weight: 600;" th:text="${currentUser != null ? currentUser.username : 'Student Account'}">Student</h6>
+                        <span style="font-size: 0.75rem; color: var(--text-nav);">Researcher</span>
+                    </div>
+                </div>
+                <form th:action="@{/logout}" method="post" class="m-0">
+                    <button type="submit" class="btn btn-link text-danger p-1" title="Sign Out">
+                        <i class="bi bi-power fs-5"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <main class="main-content">
+        <div class="mb-4">
+            <h2 class="fw-bold mb-1" th:text="${activeTab == 'upload' ? 'Upload New Research Project' : (activeTab == 'approved' ? 'Approved Proposals Index' : (activeTab == 'funded' ? 'Funded Projects Hub' : (activeTab == 'progress' ? 'Active Campaign Tracking' : 'My Project Submissions')))}">Workspace</h2>
+            <p style="color: #4E5D78; margin: 0; font-size: 0.95rem;">Track evaluation stages, approval validation levels, and system funding feedback logs.</p>
+        </div>
+
+        <div th:if="${param.success != null}" class="alert alert-success alert-dismissible fade show border-0 mb-4 shadow-sm" role="alert" style="border-left: 4px solid #00AA45 !important;">
+            <i class="bi bi-check-circle-fill me-2" style="color: #00AA45;"></i>
+            <span th:if="${param.success[0] == 'applied'}">Sponsorship campaign enrollment submitted successfully to the partner pipeline!</span>
+            <span th:if="${param.success[0] == 'submitted'}">Project manuscript uploaded successfully for supervisor review.</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <div th:if="${activeTab == 'submissions' || activeTab == null}">
+            <div class="dashboard-card" th:if="${not #lists.isEmpty(myProjects)}">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr class="table-light">
+                                <th>Project Title</th>
+                                <th>Assigned Supervisor</th>
+                                <th>Status Mapping</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="p : ${myProjects}">
+                                <td th:text="${p.title}" class="fw-bold text-dark">Title</td>
+                                <td th:text="${p.supervisorName != null ? p.supervisorName : 'Awaiting Assignment'}">Supervisor</td>
+                                <td>
+                                    <span th:if="${p.status == 'PENDING_SUPERVISOR' || p.status == 'PENDING'}" class="badge-pending">PENDING</span>
+                                    <span th:if="${p.status == 'APPROVED' || p.status == 'SUPERVISOR_APPROVED' || p.status == 'FORWARDED_TO_SPONSOR' || p.status == 'APPLIED_FOR_FUNDING'}" class="badge-approved" th:text="${p.status}">APPROVED</span>
+                                    <span th:if="${p.status == 'FUNDED'}" class="badge-funded">FUNDED</span>
+                                </td>
+                                <td>
+                                    <a th:if="${p.filePath != null}" th:href="@{/download(id=${p.id})}" class="btn btn-sm btn-outline-primary px-3 rounded">
+                                        <i class="bi bi-file-earmark-pdf"></i> View Documentation
+                                    </a>
+                                    <span th:unless="${p.filePath != null}" class="text-muted small">No File Attached</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="dashboard-card text-center py-5" th:if="${#lists.isEmpty(myProjects)}">
+                <h5 class="text-secondary">No Projects Uploaded Yet</h5>
+                <p class="text-muted small">Go to the 'Upload Project' tab to submit your manuscript.</p>
+            </div>
+        </div>
+
+        <div class="dashboard-card" th:if="${activeTab == 'upload'}">
+            <h5 class="fw-bold mb-4" style="color: #0B0F19;">Submit Project Repository Manuscript</h5>
+            <form th:action="@{/submit-project}" method="post" enctype="multipart/form-data">
+                
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Assign Your Supervisor:</label>
+                    <select name="supervisorName" class="form-select" required>
+                        <option value="" disabled selected>-- Select an assigned lecturer --</option>
+                        <option th:each="s : ${supervisors}" th:value="${s.username}" th:text="${s.username}"></option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Project Title:</label>
+                    <input type="text" name="title" class="form-control" placeholder="Enter system or study title..." required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Project Abstract / Research Scope Context:</label>
+                    <textarea name="description" class="form-control" rows="4" placeholder="Provide brief summary details..." required></textarea>
+                </div>
+
+                <input type="hidden" name="studentEmail" th:value="${currentUser != null ? currentUser.username : 'student@gmail.com'}">
+
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">Upload Manuscript Proposal Documentation (PDF/DOCX):</label>
+                    <input type="file" name="projectFile" class="form-control">
+                </div>
+
+                <button type="submit" class="btn btn-accent w-100 fw-bold">
+                    <i class="bi bi-cloud-arrow-up-fill me-2"></i>Submit Proposal
+                </button>
+            </form>
+        </div>
+
+        <div th:if="${activeTab == 'approved'}">
+            <div class="dashboard-card">
+                <h5 class="fw-bold mb-3" style="color: #0B0F19;">Verified Academic Clearances</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr class="table-light">
+                                <th>Project Title</th>
+                                <th>Evaluating Supervisor</th>
+                                <th>Sponsorship Alignment Pipeline</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="p : ${myProjects}">
+                                <td th:text="${p.title}" class="fw-bold text-dark">Project Title</td>
+                                <td th:text="${p.supervisorName != null ? p.supervisorName : 'Unassigned'}">Lecturer</td>
+                                <td>
+                                    <span th:if="${p.status == 'FUNDED' || p.forwardedToSponsor || p.status == 'APPLIED_FOR_FUNDING'}" class="badge-funded">
+                                        <i class="bi bi-send-check"></i> Forwarded to Corporate Sponsors
+                                    </span>
+                                    <span th:if="${(p.status == 'APPROVED' || p.status == 'SUPERVISOR_APPROVED') && !p.forwardedToSponsor}" class="badge-approved">
+                                        <i class="bi bi-check-circle"></i> Verified by Faculty Desk
+                                    </span>
+                                    <span th:if="${p.status == 'PENDING' || p.status == 'PENDING_SUPERVISOR'}" class="badge-pending">
+                                        <i class="bi bi-hourglass-split"></i> Review In Progress
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div th:if="${activeTab == 'funded'}">
+            <div class="dashboard-card">
+                <h5 class="fw-bold mb-3" style="color: #0B0F19;">Grant Funded Index</h5>
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+                        <thead>
+                            <tr class="table-light">
+                                <th>Project Context</th>
+                                <th>Status Matrix</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="p : ${myProjects}">
+                                <td><span class="fw-bold text-dark" th:text="${p.title}">Project Title</span></td>
+                                <td>
+                                    <span th:if="${p.status == 'FUNDED'}" class="badge-funded">Fully Funded Grant Allocation</span>
+                                    <span th:unless="${p.status == 'FUNDED'}" class="badge-pending">Sponsorship Review Stage</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div th:if="${activeTab == 'progress'}">
+            
+            <div class="dashboard-card border border-primary-subtle" style="background-color: #FAFBFC;">
+                <h5 class="fw-bold mb-2 text-dark"><i class="bi bi-pencil-square text-primary me-2"></i>Apply for Corporate Grants Pipeline</h5>
+                <p class="text-muted small mb-4">Link your academic proposal with active sponsor initiatives using published campaign identifier metrics.</p>
+                
+                <form th:action="@{/student/apply-funding}" method="post">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-secondary text-uppercase">Link Qualified Project File</label>
+                            <select name="projectId" class="form-select" required style="padding: 0.6rem;">
+                                <option value="" disabled selected>-- Select an uploaded blueprint --</option>
+                                <option th:each="proj : ${myProjects}" th:value="${proj.id}" th:text="${proj.title}"></option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-secondary text-uppercase">Active Opportunity ID</label>
+                            <input type="number" name="fundingOpportunityId" class="form-control" placeholder="e.g., 104" min="1" required style="padding: 0.6rem;">
+                        </div>
+                        <div class="col-12 text-end mt-3">
+                            <button type="submit" class="btn btn-primary fw-medium px-4"><i class="bi bi-file-earmark-check me-1"></i>Transmit Funding Application</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="dashboard-card">
+                <h5 class="fw-bold mb-4" style="color: #0B0F19;">Active Campaign Progression Ledger</h5>
+                
+                <div th:each="p : ${myProjects}" class="border rounded p-4 mb-3 bg-light">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="fw-bold text-dark" th:text="${p.title}">Title</span>
+                        <span class="text-primary small fw-semibold" 
+                              th:text="${p.status == 'FUNDED'} ? '100% Capitalized' : (${p.status == 'FORWARDED_TO_SPONSOR' || p.status == 'APPLIED_FOR_FUNDING'} ? '70% Progress (Sponsor Pipeline)' : (${p.status == 'APPROVED' || p.status == 'SUPERVISOR_APPROVED'} ? '50% Verified' : '15% Review Pending'))">Status</span>
+                    </div>
+                    <div class="progress" style="height: 10px; border-radius: 8px;">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" 
+                             th:style="${p.status == 'FUNDED'} ? 'width: 100%; background-color:#00AA45;' : (${p.status == 'FORWARDED_TO_SPONSOR' || p.status == 'APPLIED_FOR_FUNDING'} ? 'width: 70%; background-color:#0052FF;' : (${p.status == 'APPROVED' || p.status == 'SUPERVISOR_APPROVED'} ? 'width: 50%; background-color:#01B2FF;' : 'width: 15%; background-color:#FFA000;'))"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+com\mmu\repository\RepositoryApplication.class
+com\mmu\repository\data\ProjectRepository.class
+com\mmu\repository\data\UserRepository.class
+com\mmu\repository\model\Project.class
+com\mmu\repository\controller\ProjectController.class
+com\mmu\repository\model\User.class

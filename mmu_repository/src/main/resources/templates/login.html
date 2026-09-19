@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multimedia UniversityRepository | Sign In</title>
+    <!-- Bootstrap 5 for clean layout alignments -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: hsl(220, 22%, 62%);
+            color: lab(86.62% 5.5 -7.49);
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+        }
+
+        .portal-title {
+            font-size: 2.5rem;
+            color: #555555;
+            margin-bottom: 1.5rem;
+            font-weight: 300;
+        }
+
+        .portal-title strong {
+            font-weight: 700;
+            color: #333333;
+        }
+
+        .login-box {
+            width: 100%;
+            max-width: 450px;
+            background-color: #ffffff;
+            border: 1px solid #b3a814;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .login-header {
+            background-color: #bef034;
+            color: #ffffff;
+            padding: 12px 20px;
+            font-size: 1.25rem;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .login-header i {
+            font-size: 1rem;
+        }
+
+        .login-body {
+            padding: 25px;
+        }
+
+        .session-text {
+            text-align: center;
+            color: #666666;
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label-custom {
+            font-weight: 700;
+            color: #333333;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+
+        .form-control-custom {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d2d6de;
+            color: #555555;
+            font-size: 0.95rem;
+            border-radius: 0;
+            margin-bottom: 1.25rem;
+            transition: border-color 0.15s ease-in-out;
+        }
+
+        .form-control-custom:focus {
+            border-color: #3c8dbc;
+            outline: none;
+            box-shadow: none;
+        }
+
+        /* Action Buttons Styling matching the reference screenshot layout */
+        .btn-forgot {
+            background-color: #f39c12;
+            color: #ffffff;
+            border: none;
+            border-radius: 3px;
+            padding: 6px 12px;
+            font-size: 0.9rem;
+            font-weight: 400;
+        }
+
+        .btn-forgot:hover {
+            background-color: #e08e0b;
+            color: #ffffff;
+        }
+
+        .btn-signin {
+            background-color: #440399;
+            color: #ffffff;
+            border: none;
+            border-radius: 3px;
+            padding: 6px 16px;
+            font-size: 0.9rem;
+            font-weight: 400;
+        }
+
+        .btn-signin:hover {
+            background-color: #a37e2c;
+            color: #ffffff;
+        }
+
+        .alert-danger-custom {
+            background-color: #f2dede;
+            border: 1px solid #ebccd1;
+            color: #a94442;
+            padding: 10px;
+            margin-bottom: 15px;
+            font-size: 0.875rem;
+        }
+
+        .alert-success-custom {
+            background-color: #dcfce7;
+            border: 1px solid #bbf7d0;
+            color: #15803d;
+            padding: 10px;
+            margin-bottom: 15px;
+            font-size: 0.875rem;
+        }
+
+        .utility-links {
+            font-size: 0.9rem;
+            color: #666666;
+            margin-top: 15px;
+            border-top: 1px dashed #eee;
+            padding-top: 12px;
+        }
+
+        .utility-links a {
+            color: #3c8dbc;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .utility-links a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Institution Branding Banner Line -->
+    <div class="portal-title">
+        <strong>Multimedia University</strong> 
+    </div>
+
+    <!-- Exact Sign-In Container Block -->
+    <div class="login-box">
+        <div class="login-header">
+            <span>Sign in</span>
+            <!-- Decorative icon square on right side of header line -->
+            <span style="opacity: 0.7; font-size: 0.8rem;">⬛</span>
+        </div>
+
+      <div class="login-body">
+    <p class="session-text">Sign in to start your session</p>
+
+    <div th:if="${registrationSuccess}" class="alert alert-success-custom text-center fw-bold shadow-sm mb-3">
+        Registration successful! Please wait for an administrator to approve your account.
+    </div>
+
+    <div th:if="${param.error != null}" class="alert alert-danger-custom">
+        <span th:if="${param.error[0] == 'invalidCredentials'}">Invalid username or password.</span>
+        <span th:if="${param.error[0] == 'userNotFound'}">Account username not found.</span>
+        <span th:if="${param.error[0] == 'awaitingApproval'}">Account pending administrator registration approval.</span>
+        <span th:if="${param.error[0] == 'systemFailure'}">System authentication pipeline failure.</span>
+    </div>  
+
+    <form th:action="@{/login}" method="post">
+                
+                <!-- Username Parameter Row -->
+                <div class="form-group">
+                    <label class="form-label-custom">Username:</label>
+                    <input type="text" 
+                           name="username" 
+                           class="form-control-custom" 
+                           placeholder="Username" 
+                           required>
+                </div>
+
+                <!-- Password Parameter Row -->
+                <div class="form-group">
+                    <label class="form-label-custom">Password:</label>
+                    <input type="password" 
+                           name="password" 
+                           class="form-control-custom" 
+                           placeholder="Password" 
+                           required>
+                </div>
+
+                <!-- ADDED: Role Selection Dropdown Menu Component -->
+                <div class="form-group">
+                    <label class="form-label-custom">Portal Domain / Role:</label>
+                    <select name="role" class="form-control-custom" style="background-color: #ffffff; cursor: pointer;">
+                        <option value="STUDENT">Student Portal Workspace</option>
+                        <option value="SUPERVISOR">Academic Supervisor Portal</option>
+                        <option value="SPONSOR">Corporate Sponsor Workspace</option>
+                        <option value="ADMIN">System Administration Management</option>
+                    </select>
+                </div>
+
+                <!-- Lower Layout Row for Buttons Triggering Workflows -->
+                <div class="d-flex justify-content-between align-items-center pt-2">
+                    <button type="button" class="btn btn-forgot">Forgot password?</button>
+                    <button type="submit" class="btn btn-signin">Sign In</button>
+                </div>
+
+            </form>
+
+            <!-- ADDED: Create Account Utility Segment Layout matching text elements -->
+            <div class="utility-links text-start">
+                Need an account? Please click <a href="/register">here</a> to register.
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
