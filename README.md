@@ -1,2 +1,2 @@
 # MMU-REPOSITORY
-Cengralized repository system
+Centralized repository system
